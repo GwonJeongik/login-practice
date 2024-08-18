@@ -3,7 +3,9 @@ package hello.login.web.login;
 import hello.login.domain.login.LoginService;
 import hello.login.domain.member.Member;
 import hello.login.web.login.form.LoginForm;
+import hello.login.web.session.SessionManager;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 public class LoginController {
 
     private final LoginService loginService;
+    private final SessionManager sessionManager;
 
     @GetMapping("/login")
     public String loginForm(@ModelAttribute LoginForm form) {
@@ -42,14 +45,14 @@ public class LoginController {
         }
 
         //로그인 성공 처리 TODO
-        response.addCookie(new Cookie("memberId", String.valueOf(loginMember.getId())));
+        sessionManager.createSession(loginMember, response);
 
         return "redirect:/";
     }
 
     @PostMapping("/logout")
-    public String logout(HttpServletResponse response) {
-        expireCookie(response, "memberId");
+    public String logout(HttpServletRequest request) {
+        sessionManager.expireSession(request);
 
         return "redirect:/";
     }

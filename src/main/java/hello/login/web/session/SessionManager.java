@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SessionManager {
 
     public static final String SESSION_COOKIE_NAME = "mySessionId";
+
     private final Map<String, Object> sessionStore = new ConcurrentHashMap<>();
 
 
@@ -24,9 +25,9 @@ public class SessionManager {
 
         //세션 ID 생성하고, 값을 세션 저장소에 저장
         String sessionId = UUID.randomUUID().toString();
-        sessionStore.put(SESSION_COOKIE_NAME, value);
+        sessionStore.put(sessionId, value);
 
-        //세션ID 말은 쿠키 생성
+        //세션ID를 말은 쿠키 생성
         Cookie cookie = new Cookie(SESSION_COOKIE_NAME, sessionId);
 
         //응답에 쿠키 보냄
@@ -67,13 +68,13 @@ public class SessionManager {
      * 세션 만료
      */
     public void expireSession(HttpServletRequest request) {
-        
+
         //삭제할 쿠키를 찾아야함
         Cookie sessionCookie = findCookie(request, SESSION_COOKIE_NAME);
 
         //찾은 쿠키의 값이 비어있지 않으면, 세션 저장소에서 쿠키에 맵핑 되는 값을 삭제한다.
         //반환이 없기 때문에 if(sessionCookie == null)로 하게 되면 return null;로 반환값을 받아야 하는 건 별로잖아.
-        //그냥 아닐 때는 그냥 넘어가고, 맞으면 삭제하고 로직 끝.
+        //아닐 때는 그냥 넘어가고, 맞으면 삭제하고 로직 끝.
         if (sessionCookie != null) {
             sessionStore.remove(sessionCookie.getValue());
         }
