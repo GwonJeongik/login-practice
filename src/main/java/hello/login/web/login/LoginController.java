@@ -14,6 +14,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -28,7 +29,9 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(@Validated @ModelAttribute LoginForm form, BindingResult bindingResult, HttpServletRequest request) {
+    public String login(@Validated @ModelAttribute LoginForm form, BindingResult bindingResult,
+                        @RequestParam(defaultValue = "/") String redirectURL,
+                        HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             return "login/loginForm";
@@ -45,15 +48,12 @@ public class LoginController {
         //로그인 성공 처리
         //세션이 있으면 있는 세션을 반환하고, 없으면 세션을 새로 생성해서 반환한다.
         HttpSession session = request.getSession();
-        log.info("1. Session ID: {}", session.getId());
-        log.info("1. Login Member: {}", session.getAttribute(SessionConst.LOGIN_MEMBER));
 
         //세션에 로그인 회원 정보 보관
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
-        log.info("2. Session ID: {}", session.getId());
-        log.info("2. Login Member: {}", session.getAttribute(SessionConst.LOGIN_MEMBER));
 
-        return "redirect:/";
+
+        return "redirect:" + redirectURL;
     }
 
     @PostMapping("/logout")
